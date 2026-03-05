@@ -17,7 +17,7 @@ import asyncio
 import random
 
 from memory_layer.llm.protocol import LLMProvider, LLMError
-from core.observation.logger import get_logger
+from core.observation.logger import get_logger, log_llm_call, log_llm_error
 
 logger = get_logger(__name__)
 
@@ -139,6 +139,15 @@ class OpenAIProvider(LLMProvider):
                                 f"❌ [OpenAI-{self.model}] HTTP error {response.status}:"
                             )
                             logger.error(f"   💬 Error message: {error_msg}")
+
+                            # Log LLM error
+                            log_llm_error(
+                                prompt=prompt,
+                                error=error_msg,
+                                model=self.model,
+                                temperature=data.get('temperature', self.temperature)
+                            )
+
                             # Debug: 429 Too Many Requests breakpoint debugging
                             if response.status == 429:
                                 logger.warning(
@@ -169,6 +178,18 @@ class OpenAIProvider(LLMProvider):
                         prompt_tokens = usage.get('prompt_tokens', 0)
                         completion_tokens = usage.get('completion_tokens', 0)
                         total_tokens = usage.get('total_tokens', 0)
+
+                        # Get the response content
+                        response_content = response_data['choices'][0]['message']['content']
+
+                        # Log LLM call with input and output
+                        log_llm_call(
+                            prompt=prompt,
+                            response=response_content,
+                            model=self.model,
+                            tokens=total_tokens,
+                            temperature=data.get('temperature', self.temperature)
+                        )
 
                         # Print detailed usage information
 
@@ -201,7 +222,7 @@ class OpenAIProvider(LLMProvider):
                                 'timestamp': time.time(),
                             }
 
-                        return response_data['choices'][0]['message']['content']
+                        return response_content
 
             except aiohttp.ClientError as e:
                 error_time = time.perf_counter()

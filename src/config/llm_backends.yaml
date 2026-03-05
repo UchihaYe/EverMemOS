@@ -106,8 +106,30 @@ llm_backends:
     frequency_penalty: 0
     presence_penalty: 0
 
+  # Zhipu AI (GLM) configuration
+  zhipuai:
+    name: "Zhipu AI (GLM)"
+    provider: "custom"
+    base_url: "https://open.bigmodel.cn/api/paas/v4/"
+    api_key: "3a2caaa7d651488d92b3d3a552639931.vefERXlvXH0St0qd"
+    models:
+      - "glm-4.7"
+      - "glm-4"
+      - "glm-4-flash"
+      - "glm-4-air"
+      - "glm-3-turbo"
+    model: "glm-4.7"
+    timeout: 600  # Increase to 10 minutes, suitable for time-consuming tasks like paper information extraction
+    max_retries: 3
+    connect_timeout: 10
+    temperature: 0.3
+    max_tokens: 32768
+    top_p: 1
+    frequency_penalty: 0
+    presence_penalty: 0
+
 # Default backend
-default_backend: "gemini" # Mainly used for paper parsing
+default_backend: "zhipuai" # Mainly used for paper parsing
 
 # Default configuration
 default_settings:

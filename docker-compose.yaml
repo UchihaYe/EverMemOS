@@ -26,7 +26,7 @@ services:
 
   # Elasticsearch search engine
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    image: elasticsearch:8.11.0
     container_name: memsys-elasticsearch
     restart: unless-stopped
     environment:
@@ -54,7 +54,7 @@ services:
 
   # Milvus vector database
   milvus-etcd:
-    image: quay.io/coreos/etcd:v3.5.5
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/etcd:3.5.9-0
     container_name: memsys-milvus-etcd
     restart: unless-stopped
     environment:
@@ -62,9 +62,9 @@ services:
       - ETCD_AUTO_COMPACTION_RETENTION=1000
       - ETCD_QUOTA_BACKEND_BYTES=4294967296
       - ETCD_SNAPSHOT_COUNT=50000
-    command: etcd -advertise-client-urls=http://127.0.0.1:2479 -listen-client-urls http://0.0.0.0:2479 --data-dir /etcd
+    command: /usr/local/bin/etcd -listen-client-urls http://0.0.0.0:2479 --advertise-client-urls http://0.0.0.0:2479 --data-dir /etcd
     healthcheck:
-      test: ["CMD", "etcdctl", "endpoint", "health"]
+      test: ["CMD", "/usr/local/bin/etcdctl", "endpoint", "health"]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -81,8 +81,8 @@ services:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     ports:
-      - "9001:9001"
-      - "9000:9000"
+      - "19001:9001"
+      - "19000:9000"
     command: minio server /minio_data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -104,7 +104,7 @@ services:
       MINIO_ADDRESS: milvus-minio:9000
     ports:
       - "19530:19530"
-      - "9091:9091"
+      - "19091:9091"
     volumes:
       - milvus_data:/var/lib/milvus
     healthcheck:

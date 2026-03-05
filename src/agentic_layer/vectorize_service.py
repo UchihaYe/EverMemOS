@@ -26,6 +26,10 @@ from agentic_layer.vectorize_deepinfra import (
     DeepInfraVectorizeService,
     DeepInfraVectorizeConfig,
 )
+from agentic_layer.vectorize_zhipuai import (
+    ZhipuVectorizeService,
+    ZhipuVectorizeConfig,
+)
 from agentic_layer.metrics.vectorize_metrics import (
     record_vectorize_request,
     record_vectorize_fallback,
@@ -171,6 +175,19 @@ def _create_service_from_config(
             dimensions=dimensions,
         )
         return DeepInfraVectorizeService(config)
+    elif provider.lower() == "zhipuai":
+        config = ZhipuVectorizeConfig(
+            api_key=api_key,
+            base_url=base_url,
+            model=model,
+            timeout=timeout,
+            max_retries=max_retries,
+            batch_size=batch_size,
+            max_concurrent_requests=max_concurrent,
+            encoding_format=encoding_format,
+            dimensions=dimensions,
+        )
+        return ZhipuVectorizeService(config)
     else:
         raise VectorizeError(f"Unsupported provider: {provider}")
 

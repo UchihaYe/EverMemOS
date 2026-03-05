@@ -5,11 +5,11 @@ from memory_layer.llm.openai_provider import OpenAIProvider
 class LLMProvider:
     def __init__(self, provider_type: str, **kwargs):
         self.provider_type = provider_type
-        if provider_type == "openai":
+        if provider_type in ["openai", "zhipuai", "custom"]:
             self.provider = OpenAIProvider(**kwargs)
         else:
             raise ValueError(
-                f"Unsupported provider type: {provider_type}. Supported types: 'openai'"
+                f"Unsupported provider type: {provider_type}. Supported types: 'openai', 'zhipuai', 'custom'"
             )
         # TODO: add other providers
 
